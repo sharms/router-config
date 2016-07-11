@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+<meta http-equiv="refresh" content="5" >
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Jerall Traffic Stats</title>
+<!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body style="padding-top: 60px;">
+<nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">jerall.snowfoundry.net</a>
+        </div>
+      </div>
+    </nav>
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-12"><h1>Traffic</h1></div>
+</div>
+<div class="row">
+<div class="col-md-6"><b>Hourly</b></div><div class="col-md-6"><b>Daily</b></div>
+</div>
+<div class="row">
+<div class="col-md-6"><img class="img-responsive" src="/snowfoundry.net/pfstat-hour-large.jpg" /></div>
+<div class="col-md-6"><img class="img-responsive" src="/snowfoundry.net/pfstat-day-large.jpg" /></div>
+</div>
+
+<div class="row">
+<div class="col-md-12"><h1>Packets</h1></div>
+</div>
+<div class="row">
+<div class="col-md-6"><b>Hourly</b></div><div class="col-md-6"><b>Daily</b></div>
+</div>
+<div class="row">
+<div class="col-md-6"><img class="img-responsive" src="/snowfoundry.net/pfstat-packets-hour-large.jpg" /></div>
+<div class="col-md-6"><img class="img-responsive" src="/snowfoundry.net/pfstat-packets-day-large.jpg" /></div>
+</div>
+
+<div class="row">
+<div class="col-md-12"><h1>Errors</h1></div>
+</div>
+<div class="row">
+<div class="col-md-6"><b>Hourly</b></div><div class="col-md-6"><b>Daily</b></div>
+</div>
+<div class="row">
+<div class="col-md-6"><img class="img-responsive" src="/snowfoundry.net/pfstat-errors-hour-large.jpg" /></div>
+<div class="col-md-6"><img class="img-responsive" src="/snowfoundry.net/pfstat-errors-day-large.jpg" /></div>
+</div>
+
+<div class="row">
+<div class="col-md-12"><h1>States</h1></div>
+</div>
+<div class="row">
+<div class="col-md-6"><b>Hourly</b></div><div class="col-md-6"><b>Daily</b></div>
+</div>
+<div class="row">
+<div class="col-md-6"><img class="img-responsive" src="/snowfoundry.net/pfstat-states-hour-large.jpg" /></div>
+<div class="col-md-6"><img class="img-responsive" src="/snowfoundry.net/pfstat-states-day-large.jpg" /></div>
+</div>
+
+
+
+<div class="row">
+<div class="col-md-12"><h1>Settings</h1></div>
+</div>
+<div class="row">
+<div class="col-md-6"><b>/etc/sysctl.conf</b></div><div class="col-md-6"><b>/etc/pf.conf</b></div>
+</div>
+<div class="row">
+<div class="col-md-6"><pre>
+net.inet.ip.forwarding=1
+net.inet.udp.recvspace=131072
+net.inet.udp.sendspace=131072
+kern.bufcachepercent=90
+net.inet.ip.ifq.maxlen=512
+net.inet.ip.mtudisc=0
+net.inet.tcp.rfc3390=1
+net.inet.tcp.mssdflt=1440
+</pre>
+<b>Services</b>
+<pre>
+cron
+dhcpd
+httpd
+ntpd
+pflogd
+smtpd
+sndiod
+sshd
+syslogd
+unbound
+</pre>
+</div>
+<div class="col-md-6">
+<pre>
+int_if="{ re0 }"
+table <martians> { 0.0.0.0/8 10.0.0.0/8 127.0.0.0/8 169.254.0.0/16 \
+                   172.16.0.0/12 192.0.0.0/24 192.0.2.0/24 224.0.0.0/3 \
+                   192.168.0.0/16 198.18.0.0/15 198.51.100.0/24 \
+                   203.0.113.0/24 }
+set block-policy drop
+set loginterface egress
+set loginterface ingress
+set skip on lo
+match in all scrub (no-df random-id max-mss 1440)
+match out on egress inet from !(egress:network) to any nat-to (egress:0) label "internet nat egress"
+block in quick on egress from <martians> to any
+block return out quick on egress from any to <martians>
+block all
+pass out quick inet label "internet out"
+pass in on $int_if inet
+#pass in on egress inet proto tcp from any to (egress) port 22
+#pass in on egress inet proto tcp from any to (egress)
+
+block return    # block stateless traffic
+pass            # establish keep-state
+
+# By default, do not permit remote connections to X11
+block return in on ! lo0 proto tcp to port 6000:6010
+</pre>
+</div>
+</div>
+
+
+<div class="row">
+<div class="col-md-4"></div>
+<div class="col-md-4"><h2 class="text-center">Powered By</h2></div>
+</div>
+
+
+<div class="row">
+<div class="col-md-4"></div>
+<div class="col-md-4"><img class="img-responsive" src="img/openbsd.gif" /></div>
+</div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
