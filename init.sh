@@ -36,3 +36,20 @@ forward-zone:
 EOF
 rcctl enable unbound
 cp ./pf.conf /etc/
+cd /usr
+cvs -qd anoncvs@anoncvs.usa.openbsd.org:/cvs get -rOPENBSD_`uname -r | sed 's/\./_/'` -P src
+cd /usr/src
+cvs -q up -rOPENBSD_`uname -r | sed 's/\./_/'` -Pd
+cd /usr/src/sys/arch/`machine`/conf
+config GENERIC.MP
+cd ../compile/GENERIC.MP
+make clean && make && make install
+cd /usr/src
+make obj
+cd /usr/src/etc && env DESTDIR=/ make distrib-dirs
+cd /usr/src
+make build
+rm -rf /usr/xobj/*
+rm -rf /usr/obj/*
+reboot
+
